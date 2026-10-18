@@ -1,0 +1,86 @@
+{
+  "name": "alfasix/alfakit-comments",
+  "description": "Comments with mentions, reactions and notifications on any record of an AlfaKit panel: an infolist entry, a slide-over action, a table action and a polling widget.",
+  "keywords": [
+    "laravel",
+    "alfakit",
+    "comments",
+    "mentions",
+    "reactions",
+    "collaboration"
+  ],
+  "homepage": "https://alfakit.dev/docs/plugins/comments",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Alfa Six",
+      "homepage": "https://alfasixbh.com",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/alfasixbh/alfakit/issues",
+    "source": "https://github.com/alfasixbh/alfakit"
+  },
+  "require": {
+    "php": "^8.3",
+    "alfasix/alfakit": "^0.1|@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "AlfaSix\\AlfakitComments\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AlfaSix\\AlfakitComments\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "AlfaSix\\AlfakitComments\\AlfakitCommentsServiceProvider"
+      ]
+    },
+    "alfakit": {
+      "version": "^0.1",
+      "frontend": null,
+      "showcase": {
+        "demoPath": "orders/1",
+        "tour": [
+          "Open an order",
+          "Write a comment and mention a colleague",
+          "React with an emoji",
+          "Open comments from the table action"
+        ],
+        "clips": [
+          "react-light",
+          "react-dark",
+          "vue-light",
+          "vue-dark",
+          "svelte-light",
+          "svelte-dark"
+        ],
+        "worksWith": [
+          "activity-log",
+          "workflows",
+          "helpdesk"
+        ],
+        "highlights": [
+          "Comments on any record",
+          "Mentions with notifications",
+          "Reactions",
+          "Infolist entry and slide-over action",
+          "Table action and polling widget",
+          "Policy-checked editing and deletion"
+        ]
+      }
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
