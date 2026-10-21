@@ -5,6 +5,7 @@ declare(strict_types=1);
 use AlfaSix\AlfakitComments\CommentsPlugin;
 use AlfaSix\AlfakitComments\Models\Comment;
 use AlfaSix\AlfakitComments\Support\Comments;
+use AlfaSix\AlfakitComments\Tests\Fixtures\Models\Ticket;
 use AlfaSix\AlfakitComments\Tests\Fixtures\Resources\TicketResource\Pages\EditTicket;
 use AlfaSix\AlfakitComments\Tests\Fixtures\Resources\TicketResource\Pages\ListTickets;
 use AlfaSix\AlfakitComments\Tests\Fixtures\Resources\TicketResource\Pages\ViewTicket;
@@ -106,6 +107,20 @@ it('posts a comment through the action endpoint and reloads the page', function 
     expect($comment->body)->not->toContain('script')
         ->and($comment->isAuthoredBy($ada))->toBeTrue()
         ->and($jane->notifications()->count())->toBe(1);
+});
+
+it('opens an empty composer on a record that has a body of its own', function (): void {
+    actingAs(user('Ada'));
+    $ticket = Ticket::query()->create(['title' => 'Printer on fire', 'body' => '<p>The ticket text</p>']);
+    $url = '/comments/tickets/'.$ticket->getKey();
+
+    $modal = Pest\Laravel\getJson('/comments/_alfakit/actions/modal?'.http_build_query([
+        'token' => pageProps($url)['token'],
+        'component' => 'field:infolist::comments-composer',
+        'action' => 'postComment',
+    ]), ['Referer' => 'http://localhost'.$url])->assertOk()->json();
+
+    expect($modal['form']['state']['body'] ?? null)->toBeNull();
 });
 
 it('rejects blank comments', function (): void {

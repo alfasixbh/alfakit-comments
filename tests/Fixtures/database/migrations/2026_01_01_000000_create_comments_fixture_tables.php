@@ -14,6 +14,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('team_id')->nullable();
             $table->string('title');
+            // A `body` like the composer's field: it must never prefill a new comment.
+            $table->text('body')->nullable();
             $table->boolean('is_private')->default(false);
             $table->timestamps();
         });

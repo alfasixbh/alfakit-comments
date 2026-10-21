@@ -469,6 +469,8 @@ class CommentsEntry extends Group
             ->icon('message-square-plus')
             ->modalHeading(__('alfakit-comments::comments.actions.post'))
             ->modalSubmitActionLabel(__('alfakit-comments::comments.actions.post_submit'))
+            // Always empty: the action runs on the page's record, whose own `body` would fill it.
+            ->fillForm(['body' => null])
             ->schema([CommentEditor::make('body')])
             ->visible(fn (): bool => ($commentable = $this->getCommentable()) !== null && Comments::can('create', $commentable))
             ->successNotificationTitle(__('alfakit-comments::comments.notifications.posted'))

@@ -109,6 +109,8 @@ class CommentsWidget extends TableWidget
             ->icon('message-square-plus')
             ->modalHeading(__('alfakit-comments::comments.actions.post'))
             ->modalSubmitActionLabel(__('alfakit-comments::comments.actions.post_submit'))
+            // Always empty: the action runs on the page's record, whose own `body` would fill it.
+            ->fillForm(['body' => null])
             ->schema([CommentEditor::make('body')])
             ->visible(fn (): bool => ($record = $this->getRecord()) !== null && Comments::can('create', $record))
             ->successNotificationTitle(__('alfakit-comments::comments.notifications.posted'))
