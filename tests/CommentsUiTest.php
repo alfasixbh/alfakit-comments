@@ -49,6 +49,22 @@ function cmPlugin(): CommentsPlugin
     return $plugin instanceof CommentsPlugin ? $plugin : throw new RuntimeException('The comments plugin is not registered.');
 }
 
+it('gives the comment editor the full width of its modal', function (): void {
+    alfakit()->setCurrentPanel(alfakit()->getPanel('comments'));
+
+    expect(AlfaSix\AlfakitComments\Support\CommentEditor::make()->getColumnSpan())->toBe(['default' => 'full']);
+});
+
+it('lets each comment body follow its own writing direction', function (): void {
+    actingAs(user('Ada'));
+    $ticket = ticket();
+    $comment = $ticket->comment('<p>Looks good.</p>');
+
+    $body = component(pageProps('/comments/tickets/'.$ticket->getKey())['content'], 'comments-'.$comment->getKey().'-body');
+
+    expect($body['extraAttributes'] ?? null)->toMatchArray(['dir' => 'auto']);
+});
+
 it('renders the comments on a resource view page', function (): void {
     $ada = user('Ada');
     $jane = user('Jane');

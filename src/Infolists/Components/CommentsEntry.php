@@ -370,7 +370,10 @@ class CommentsEntry extends Group
                 ->hiddenLabel()
                 ->state($comment->getRenderedBody())
                 ->html()
-                ->prose(),
+                ->prose()
+                // A comment is written in its author's language, not the panel's: an English
+                // comment in an Arabic panel keeps its punctuation where it belongs.
+                ->extraAttributes(['dir' => 'auto']),
             Actions::make($this->makeCommentActions($comment))->key("{$prefix}-actions"),
         ])->dense()->key("{$prefix}-content");
 

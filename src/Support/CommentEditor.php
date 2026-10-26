@@ -21,6 +21,9 @@ final class CommentEditor
         $plugin = CommentsPlugin::get();
 
         return RichEditor::make($name)
+            // The comment modals lay out their form in the default two-column grid: take the
+            // full width instead of leaving the right half of the modal empty.
+            ->columnSpanFull()
             ->hiddenLabel()
             ->placeholder(__('alfakit-comments::comments.editor.placeholder'))
             ->required()
