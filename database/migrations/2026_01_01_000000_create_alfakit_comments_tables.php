@@ -22,7 +22,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('comment_id')->constrained('alfakit_comments')->cascadeOnDelete();
             $table->morphs('reactor');
-            $table->string('reaction', 32);
+            $reaction = $table->string('reaction', 32);
+
+            // MySQL and MariaDB compare every emoji as equal under their default collation:
+            // 👍 and 🎉 would be one reaction. A binary collation compares them exactly.
+            if (in_array(Schema::getConnection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+                $reaction->collation('utf8mb4_bin');
+            }
             $table->timestamps();
 
             $table->unique(['comment_id', 'reactor_type', 'reactor_id', 'reaction'], 'alfakit_comment_reactions_unique');

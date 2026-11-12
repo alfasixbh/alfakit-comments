@@ -121,7 +121,10 @@ final class Comments
             ->where('reactor_type', $reactor->getMorphClass())
             ->where('reactor_id', $reactor->getKey())
             ->where('reaction', $reaction)
-            ->first();
+            ->get()
+            // Exactly this reaction: a table from before the column compared exactly (MySQL,
+            // MariaDB) answers with any emoji for any emoji.
+            ->first(static fn (Model $existing): bool => $existing->getAttribute('reaction') === $reaction);
 
         if ($existing !== null) {
             $existing->delete();
