@@ -230,3 +230,27 @@ it('detects blank bodies', function (): void {
         ->and(CommentBody::isBlank('<p>x</p>'))->toBeFalse()
         ->and(CommentBody::excerpt('<p>One</p><p>Two   three</p>', 7))->toBe('One Two...');
 });
+
+it('does not notify mentioned users who may not view the record', function (): void {
+    Event::fake([UserWasMentioned::class]);
+    $author = user('Ada');
+    $manager = user('Jane');
+    $intern = user('Bob');
+    actingAs($author);
+
+    // The record has a policy: only Ada and Jane may view it.
+    Gate::policy(AlfaSix\AlfakitComments\Tests\Fixtures\Models\Ticket::class, get_class(new class
+    {
+        public function view($user): bool
+        {
+            return in_array($user->name, ['Ada', 'Jane'], true);
+        }
+    }));
+
+    ticket()->comment('<p>'.mention($manager).' and '.mention($intern).'</p>', $author);
+
+    expect($manager->notifications()->count())->toBe(1)
+        ->and($intern->notifications()->count())->toBe(0);
+
+    Event::assertDispatchedTimes(UserWasMentioned::class, 1);
+});

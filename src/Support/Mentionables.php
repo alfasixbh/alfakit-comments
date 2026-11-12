@@ -122,7 +122,13 @@ final class Mentionables
             return collect();
         }
 
-        return $query->whereKey(array_values($ids))->get()
+        $ids = self::validKeys($query->getModel(), $ids);
+
+        if ($ids === []) {
+            return collect();
+        }
+
+        return $query->whereKey($ids)->get()
             ->filter(self::isAccessible(...))
             ->values()
             ->toBase();
@@ -143,7 +149,39 @@ final class Mentionables
             return collect();
         }
 
-        return $query->getModel()->newQuery()->whereKey(array_values($ids))->get()->toBase();
+        $ids = self::validKeys($query->getModel(), $ids);
+
+        if ($ids === []) {
+            return collect();
+        }
+
+        // On a tenancy panel only the tenant's users: a mention marker with another
+        // tenant's user id must not reveal that user's name.
+        return $query->getModel()->newQuery()->whereKey($ids)->get()
+            ->filter(self::isAccessible(...))
+            ->values()
+            ->toBase();
+    }
+
+    /**
+     * The ids that can be a key of the user model. Mention markers come from the browser:
+     * `where id in ('abc')` on an integer key is an error on PostgreSQL, for every later
+     * render of the comment.
+     *
+     * @param  array<int, int|string>  $ids
+     * @return array<int, int|string>
+     */
+    private static function validKeys(Model $model, array $ids): array
+    {
+        $integer = in_array($model->getKeyType(), ['int', 'integer'], true);
+
+        return array_values(array_filter($ids, static function (int|string $id) use ($integer): bool {
+            $id = (string) $id;
+
+            return $integer
+                ? ctype_digit($id) && strlen($id) <= 18
+                : $id !== '' && strlen($id) <= 64 && preg_match('/^[A-Za-z0-9_-]+$/', $id) === 1;
+        }));
     }
 
     /**

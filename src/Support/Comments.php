@@ -181,8 +181,15 @@ final class Comments
     {
         $ids = array_values(array_diff($comment->getMentionedIds(), $except));
 
+        $commentable = $comment->commentable;
+        // With a policy for the record, only users who may view it are told about it (the
+        // notification carries an excerpt of the comment and a link to the record).
+        $policy = $commentable instanceof Model ? Gate::getPolicyFor($commentable) : null;
+        $checksView = is_object($policy) && method_exists($policy, 'view');
+
         return Mentionables::find($ids)
             ->reject(static fn (Model $user): bool => $comment->isAuthoredBy($user))
+            ->filter(static fn (Model $user): bool => ! $checksView || ! $user instanceof Authenticatable || Gate::forUser($user)->allows('view', $commentable))
             ->values();
     }
 
